@@ -111,6 +111,68 @@
             text-align: left;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #343541;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Vazirmatn', Arial, sans-serif;
+        }
+
+        .openai-button {
+            background-color: #0A84FF;
+            color: white;
+        }
+
+        .openai-button:hover {
+            background-color: #0077E6;
+        }
+
+        .avalai-button {
+            background-color: #34A853;
+            color: white;
+        }
+
+        .avalai-button:hover {
+            background-color: #2C8C46;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
         /* Media Queries for Responsive Design */
         @media (max-width: 768px) {
             .chat-container {
@@ -191,12 +253,36 @@
     </form>
 </div>
 
+<!-- Modal for service selection -->
+<div id="service-modal" class="modal">
+    <div class="modal-content">
+        <h2>انتخاب سرویس چت</h2>
+        <button class="modal-button openai-button" data-service="openai">OpenAI</button>
+        <button class="modal-button avalai-button" data-service="avalai">AvalAI</button>
+    </div>
+</div>
+
 <script>
     const form = document.querySelector("#form-question");
     const chatBox = document.getElementById("chat-box");
+    const serviceModal = document.getElementById("service-modal");
+    let selectedService = null;
+
+    // Function to handle service selection
+    document.querySelectorAll(".modal-button").forEach(button => {
+        button.addEventListener("click", (event) => {
+            selectedService = event.target.dataset.service;
+            serviceModal.style.display = "none";
+        });
+    });
 
     form.addEventListener("submit", (event) => {
         event.preventDefault();
+        if (!selectedService) {
+            alert("لطفاً یک سرویس را انتخاب کنید.");
+            return;
+        }
+
         const input = event.target.input.value.trim();
         if (input === "") return;
 
@@ -210,7 +296,7 @@
         event.target.input.value = "";
 
         const queryQuestion = encodeURIComponent(input);
-        const source = new EventSource("/ask?question=" + queryQuestion);
+        const source = new EventSource(`/ask?question=${queryQuestion}&service=${selectedService}`);
 
         // Create a bot message element
         const botMessage = document.createElement("p");
@@ -227,6 +313,11 @@
 
         // Scroll to the latest message
         chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    // Show modal on page load
+    window.addEventListener("load", () => {
+        serviceModal.style.display = "flex";
     });
 </script>
 </body>
