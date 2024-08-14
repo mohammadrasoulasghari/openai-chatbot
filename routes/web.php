@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\SpeechToGenerateController;
 use App\Http\Controllers\SpeechToTextController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,11 @@ Route::get('/', function () {
 });
 Route::get("/ask", ChatController::class);
 Route::post('/speech', [SpeechToTextController::class, 'processRequest']);
+Route::post('/convert-audio-to-text', [SpeechToGenerateController::class, 'convertAudioToText']);
+Route::get('/ask-gpt', [SpeechToGenerateController::class, 'askGPT']);
 Route::get('/speech-to-text', function () {
-    return view('speech-to0text'); // این مسیر فایل resources/views/chat.blade.php را برمی‌گرداند
+    return view('speech-to0text');
+});
+Route::get('/speech-to-generate', function () {
+    return view('speech-to-generate');
 });
