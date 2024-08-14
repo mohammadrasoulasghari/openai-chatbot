@@ -23,14 +23,14 @@
 
         .chat-container {
             width: 100%;
-            max-width: 100%;
-            height: 100%;
+            height:  100%;
             background-color: #343541;
-            border-radius: 8px;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            position: relative;
         }
 
         .chat-header {
@@ -54,9 +54,9 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            align-self: revert;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
+            padding-bottom: 70px; /* فضای کافی برای دکمه ضبط */
         }
 
         .text-display {
@@ -69,12 +69,24 @@
             font-family: 'Vazirmatn', Arial, sans-serif;
         }
 
+        .record-button-container {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+            background-color: #202123;
+            border-top: 1px solid #444654;
+        }
+
         .record-button {
             background-color: #0A84FF;
             color: white;
             border: none;
             padding: 15px 30px;
-            margin-top: 20px;
             border-radius: 50px;
             cursor: pointer;
             transition: background-color 0.3s;
@@ -82,6 +94,7 @@
             font-size: 16px;
             display: flex;
             align-items: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .record-button:hover {
@@ -128,8 +141,10 @@
     </div>
     <div id="chat-box" class="chat-box">
         <div id="text-display" class="text-display">
-            متنت اینجا نمایش داده می‌شود
+            خروجی اینجا نمایش داده می‌شود
         </div>
+    </div>
+    <div class="record-button-container">
         <button id="record-button" class="record-button">
             <span>🔴</span> ضبط صدا
         </button>
@@ -174,7 +189,7 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.transcription) {
-                                textDisplay.innerText = `متن: ${data.transcription}`;
+                                textDisplay.innerText = `خروجی: ${data.transcription}`;
                             } else {
                                 textDisplay.innerText = "خطایی رخ داده است. لطفاً دوباره امتحان کنید.";
                             }
