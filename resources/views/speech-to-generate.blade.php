@@ -65,6 +65,7 @@
             max-width: 80%;
             font-family: 'Vazirmatn', Arial, sans-serif;
             display: inline-block;
+            position: relative;
         }
 
         .user-message {
@@ -77,6 +78,22 @@
             align-self: flex-start;
             background-color: #444654;
             text-align: left;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .record-button-container {
@@ -192,10 +209,10 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.transcription) {
-                                // نمایش پیام کاربر
+                                // نمایش پیام کاربر با لودر
                                 const userMessage = document.createElement("p");
                                 userMessage.className = "message user-message";
-                                userMessage.innerText = data.transcription;
+                                userMessage.innerHTML = data.transcription + ' <span class="loader"></span>';
                                 chatBox.appendChild(userMessage);
 
                                 // ارسال پیام کاربر به ChatGPT و دریافت پاسخ به صورت استریم
@@ -204,16 +221,19 @@
 
                                 const botMessage = document.createElement("p");
                                 botMessage.className = "message bot-message";
+                                botMessage.innerHTML = '<span class="loader"></span>';
                                 chatBox.appendChild(botMessage);
 
                                 source.addEventListener("update", function (event) {
                                     if (event.data === "<END_STREAMING_SSE>") {
                                         source.close();
+                                        botMessage.querySelector('.loader').remove();
                                         return;
                                     }
                                     botMessage.innerText += event.data;
                                 });
 
+                                userMessage.querySelector('.loader').remove();
                                 chatBox.scrollTop = chatBox.scrollHeight;
                             } else {
                                 alert("خطایی در تبدیل صوت به متن رخ داده است.");
