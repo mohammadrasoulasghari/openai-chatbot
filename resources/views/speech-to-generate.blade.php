@@ -23,9 +23,9 @@
 
         .chat-container {
             width: 100%;
-            height:  100%;
+            height: 100%;
             background-color: #343541;
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -59,14 +59,24 @@
             padding-bottom: 70px; /* فضای کافی برای دکمه ضبط */
         }
 
-        .text-display {
-            background-color: #444654;
-            padding: 20px;
+        .message {
+            padding: 10px;
             border-radius: 8px;
             max-width: 80%;
-            color: white;
-            text-align: center;
             font-family: 'Vazirmatn', Arial, sans-serif;
+            display: inline-block;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #0A84FF;
+            text-align: right;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: #444654;
+            text-align: left;
         }
 
         .record-button-container {
@@ -110,7 +120,7 @@
         }
 
         @media (max-width: 768px) {
-            .text-display {
+            .message {
                 font-size: 14px;
                 padding: 15px;
             }
@@ -122,7 +132,7 @@
         }
 
         @media (max-width: 480px) {
-            .text-display {
+            .message {
                 font-size: 12px;
                 padding: 10px;
             }
@@ -182,6 +192,13 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.transcription) {
+                                // نمایش پیام کاربر
+                                const userMessage = document.createElement("p");
+                                userMessage.className = "message user-message";
+                                userMessage.innerText = data.transcription;
+                                chatBox.appendChild(userMessage);
+
+                                // ارسال پیام کاربر به ChatGPT و دریافت پاسخ به صورت استریم
                                 const queryText = encodeURIComponent(data.transcription);
                                 const source = new EventSource(`/ask-gpt?question=${queryText}`);
 
