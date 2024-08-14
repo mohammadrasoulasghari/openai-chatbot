@@ -11,7 +11,7 @@ class ChatController extends Controller
     {
         $question = $request->query('question');
         $service = $request->query('service');
-
+          info($service);
         if ($service === 'openai') {
             $apiKey = env('OPENAI_API_KEY', 'sk-proj-JQUJBt4yEjaeJxJVDcF0T3BlbkFJheiwYA28LJvW4UbFPP3t');
             $baseUrl = 'https://api.openai.com/v1';

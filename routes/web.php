@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\SpeechToTextController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +19,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get("/ask", ChatController::class);
-
-Route::get('/chat', function () {
-    return view('chat'); // این مسیر فایل resources/views/chat.blade.php را برمی‌گرداند
+Route::post('speech', [SpeechToTextController::class, 'processRequest']);
+Route::get('/speech-to-text', function () {
+    return view('speech-to0text'); // این مسیر فایل resources/views/chat.blade.php را برمی‌گرداند
 });
