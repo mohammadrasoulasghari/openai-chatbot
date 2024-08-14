@@ -17,7 +17,7 @@ class ChatController extends Controller
             $baseUrl = 'https://api.openai.com/v1';
         } else {
             $apiKey = env('AVALAI_API_KEY', 'aa-o0RU0Sa7PnZFQqeYigDMjnwbVpSeEzRutfYcgb15yKwqsKdq');
-            $baseUrl = 'https://api.avalapis.ir/v1';
+            $baseUrl = 'https://api.avalai.ir/v1';
         }
 
         $client = OpenAI::factory()
