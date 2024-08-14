@@ -19,7 +19,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get("/ask", ChatController::class);
-Route::post('speech', [SpeechToTextController::class, 'processRequest']);
+Route::post('/speech', [SpeechToTextController::class, 'processRequest']);
 Route::get('/speech-to-text', function () {
     return view('speech-to0text'); // این مسیر فایل resources/views/chat.blade.php را برمی‌گرداند
 });
