@@ -163,7 +163,7 @@
 
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                    fetch('/ask', {
+                    fetch('/speech', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': csrfToken,

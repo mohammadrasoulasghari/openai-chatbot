@@ -14,7 +14,7 @@ class SpeechToTextController extends Controller
      */
     public function processRequest(Request $request)
     {
-        // دریافت فایل صوتی و سرویس مورد استفاده
+        // دریافت فایل صوتی، سرویس مورد استفاده و زبان
         $file = $request->file('audio');
         $service = $request->input('service');
 
@@ -49,11 +49,12 @@ class SpeechToTextController extends Controller
             ->make();
 
         try {
-            // ارسال فایل برای تبدیل گفتار به متن
+            // ارسال فایل برای تبدیل گفتار به متن با مشخص کردن زبان
             $response = $client->audio()->transcribe([
                 'model' => 'whisper-1',
                 'file' => fopen($filePath, 'r'),
                 'response_format' => 'verbose_json',
+                'language' => "fa", // اضافه کردن پارامتر زبان
             ]);
 
             // لاگ کردن پاسخ API برای بررسی‌های بعدی
@@ -78,8 +79,7 @@ class SpeechToTextController extends Controller
             Log::error('Exception during audio transcription: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to process audio file.'], 500);
         }
-    }
-    private function getApiKeyForService($service)
+    }    private function getApiKeyForService($service)
     {
         if ($service === 'openai') {
             return env('OPENAI_API_KEY', 'your-openai-api-key');
