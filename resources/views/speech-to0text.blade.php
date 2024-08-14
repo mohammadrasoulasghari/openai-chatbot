@@ -173,16 +173,17 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.transcription && data.translation) {
-                                textDisplay.innerText = `متن: ${data.transcription}\nترجمه: ${data.translation}`;
+                            if (data.transcription) {
+                                textDisplay.innerText = `متن: ${data.transcription}`;
                             } else {
-                                textDisplay.innerText = "خطایی رخ داده است. لطفا دوباره امتحان کنید.";
+                                textDisplay.innerText = "خطایی رخ داده است. لطفاً دوباره امتحان کنید.";
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
                             textDisplay.innerText = "خطا در ارسال فایل صوتی.";
                         });
+
                 };
             })
             .catch(error => {

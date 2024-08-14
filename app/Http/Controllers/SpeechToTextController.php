@@ -14,23 +14,35 @@ class SpeechToTextController extends Controller
      */
     public function processRequest(Request $request)
     {
+        // دریافت فایل صوتی و سرویس مورد استفاده
         $file = $request->file('audio');
         $service = $request->input('service');
 
+        // بررسی اولیه درخواست
         if (!$file || !$service) {
             return response()->json(['error' => 'Invalid request.'], 400);
         }
 
-        // ذخیره موقت فایل در storage
-        $filename = 'temp_audio_' . time() . '.mp4';
-        $path = $file->storeAs('audio', $filename, 'public');
+        // حذف فایل موقت قبلی در صورت وجود
+        $previousFile = 'temp_audio.mp4';
+        if (Storage::disk('public')->exists('audio/' . $previousFile)) {
+            Storage::disk('public')->delete('audio/' . $previousFile);
+        }
 
-        // مسیر کامل فایل ذخیره‌شده
+        // ذخیره موقت فایل جدید
+        $filename = 'temp_audio.mp4';
+        $path = $file->storeAs('audio', $filename, 'public');
         $filePath = storage_path('app/public/' . $path);
 
-        $apiKey = $this->getApiKeyForService($service);
-        $baseUrl = $this->getBaseUrlForService($service);
+        // دریافت API key و Base URL برای سرویس انتخاب شده
+        try {
+            $apiKey = $this->getApiKeyForService($service);
+            $baseUrl = $this->getBaseUrlForService($service);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
 
+        // ایجاد کلاینت OpenAI
         $client = OpenAI::factory()
             ->withApiKey($apiKey)
             ->withBaseUri($baseUrl)
@@ -44,8 +56,16 @@ class SpeechToTextController extends Controller
                 'response_format' => 'verbose_json',
             ]);
 
+            // لاگ کردن پاسخ API برای بررسی‌های بعدی
+            Log::info('API Response: ' . json_encode($response));
+
+            // استخراج متن تبدیل شده
             $transcribedText = $response->text ?? '';
-              Log::info($transcribedText);
+
+            if (empty($transcribedText)) {
+                throw new \Exception('متن تشخیص داده نشد. لطفاً دوباره تلاش کنید.');
+            }
+
             // حذف فایل موقت
             Storage::disk('public')->delete($path);
 
@@ -59,7 +79,6 @@ class SpeechToTextController extends Controller
             return response()->json(['error' => 'Failed to process audio file.'], 500);
         }
     }
-
     private function getApiKeyForService($service)
     {
         if ($service === 'openai') {
