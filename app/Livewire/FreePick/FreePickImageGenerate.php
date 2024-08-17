@@ -86,6 +86,10 @@ class FreePickImageGenerate extends Component
         'fish-eye' => 'fish-eye',
         'first-person' => 'first-person',
     ];
+    public $selectedStyle = 'digital-art'; // مقدار پیش‌فرض برای style
+    public $selectedColor = 'vibrant'; // مقدار پیش‌فرض برای color
+    public $selectedLightning = 'cinematic'; // مقدار پیش‌فرض برای lightning
+    public $selectedFraming = 'portrait'; // مقدار پیش‌فرض برای framing
     public function render()
     {
         return view('livewire.free-pick.free-pick-image-generate');

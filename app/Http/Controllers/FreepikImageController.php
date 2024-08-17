@@ -14,9 +14,11 @@ class FreepikImageController extends Controller
     }
     public function generateImage(Request $request)
     {
-        Log::info('Request: ' . json_encode($request->all()));
+        Log::info($request->input('style'));
 
-        $client = new Client();
+        $client = new Client([
+            'verify' => false,
+        ]);
         $apiKey = env('FREEPIK_API_KEY');
 
         try {
@@ -37,11 +39,17 @@ class FreepikImageController extends Controller
                     'image' => [
                         'size' => $request->input('image_size', 'square'),
                     ],
+                    'styling' => [
+                        'style' => $request->input('style', ''),
+                        'color' => 'pastel',
+                        'lightning' => $request->input('lightning', ''),
+                        'framing' => $request->input('framing', ''),
+                    ],
                 ],
             ]);
 
             $data = json_decode($response->getBody(), true);
-            Log::info($data);
+//            Log::info($data);
             return response()->json(['images' => $data['data'], 'meta' => $data['meta']]);
 
         } catch (\Exception $e) {
