@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FreepikImageController;
 use App\Http\Controllers\SpeechToGenerateController;
 use App\Http\Controllers\SpeechToTextController;
+use App\Livewire\ChatBot;
+use App\Livewire\FreePick\FreePickImageGenerate;
+use App\Livewire\SpeechToGenerate;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +30,9 @@ Route::get('/ask-gpt', [SpeechToGenerateController::class, 'askGPT']);
 Route::get('/speech-to-text', function () {
     return view('speech-to0text');
 });
-Route::get('/speech-to-generate', function () {
-    return view('speech-to-generate');
-});
+Route::get('/speech-to-generate', SpeechToGenerate::class);
+//Route::get('/freepik', [FreepikImageController::class, 'showForm'])->name('freepik.form');
+Route::get('/freepik', FreePickImageGenerate::class)->name('freepik.form');
+
+Route::post('/generate-image', [FreepikImageController::class, 'generateImage'])->name('generate.image');
+Route::get('/test', ChatBot::class);
