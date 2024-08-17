@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>تولید تصویر با Freepik</title>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -183,7 +184,7 @@
 <main class="main-container">
     <div class="form-container">
         <h2>تولید تصویر با Freepik API</h2>
-        <form id="image-form" action="{{ route('generate.image') }}" method="POST">
+        <form id="image-form" action="/generate-image" method="POST">
             @csrf
             <div class="form-group">
                 <div>
@@ -216,12 +217,105 @@
                 </div>
             </div>
             <div class="form-group">
-                <div style="flex: 1;">
+                <div>
                     <label for="image_size">اندازه تصویر:</label>
                     <select id="image_size" name="image_size">
                         <option value="square">مربع</option>
                         <option value="portrait">پرتره</option>
                         <option value="landscape">لنداسکیپ</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div style="flex: 1;">
+                    <label for="style">استایل:</label>
+                    <select id="style" name="style">
+                        <option value="">بدون استایل</option>
+                        <option value="photo">photo</option>
+                        <option value="digital-art">digital-art</option>
+                        <option value="3d">3d</option>
+                        <option value="painting">painting</option>
+                        <option value="low-poly">low-poly</option>
+                        <option value="pixel-art">pixel-art</option>
+                        <option value="anime">anime</option>
+                        <option value="cyberpunk">cyberpunk</option>
+                        <option value="comic">comic</option>
+                        <option value="vintage">vintage</option>
+                        <option value="cartoon">cartoon</option>
+                        <option value="vector">vector</option>
+                        <option value="studio-shot">studio-shot</option>
+                        <option value="dark">dark</option>
+                        <option value="sketch">sketch</option>
+                        <option value="mockup">mockup</option>
+                        <option value="2000s-pone">2000s-pone</option>
+                        <option value="70s-vibe">70s-vibe</option>
+                        <option value="watercolor">watercolor</option>
+                        <option value="art-nouveau">art-nouveau</option>
+                        <option value="origami">origami</option>
+                        <option value="surreal">surreal</option>
+                        <option value="fantasy">fantasy</option>
+                        <option value="traditional-japan">traditional-japan</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label for="color">رنگ:</label>
+                    <select id="color" name="color">
+                        <option value="">بدون رنگ</option>
+                        <option value="b&w">b&w</option>
+                        <option value="pastel">pastel</option>
+                        <option value="sepia">sepia</option>
+                        <option value="dramatic">dramatic</option>
+                        <option value="vibrant">vibrant</option>
+                        <option value="orange&teal">orange&teal</option>
+                        <option value="film-filter">film-filter</option>
+                        <option value="split">split</option>
+                        <option value="electric">electric</option>
+                        <option value="pastel-pink">pastel-pink</option>
+                        <option value="gold-glow">gold-glow</option>
+                        <option value="autumn">autumn</option>
+                        <option value="muted-green">muted-green</option>
+                        <option value="deep-teal">deep-teal</option>
+                        <option value="terracotta&teal">terracotta&teal</option>
+                        <option value="red&blue">red&blue</option>
+                        <option value="cold-neon">cold-neon</option>
+                        <option value="burgundy&blue">burgundy&blue</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div style="flex: 1;">
+                    <label for="lightning">نورپردازی:</label>
+                    <select id="lightning" name="lightning">
+                        <option value="">بدون نورپردازی</option>
+                        <option value="studio">studio</option>
+                        <option value="warm">warm</option>
+                        <option value="cinematic">cinematic</option>
+                        <option value="volumetric">volumetric</option>
+                        <option value="golden-hour">golden-hour</option>
+                        <option value="long-exposure">long-exposure</option>
+                        <option value="cold">cold</option>
+                        <option value="iridescent">iridescent</option>
+                        <option value="dramatic">dramatic</option>
+                        <option value="hardlight">hardlight</option>
+                        <option value="redscale">redscale</option>
+                        <option value="indoor-light">indoor-light</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label for="framing">کادر:</label>
+                    <select id="framing" name="framing">
+                        <option value="">بدون کادر</option>
+                        <option value="portrait">portrait</option>
+                        <option value="macro">macro</option>
+                        <option value="panoramic">panoramic</option>
+                        <option value="aerial-view">aerial-view</option>
+                        <option value="close-up">close-up</option>
+                        <option value="cinematic">cinematic</option>
+                        <option value="high-angle">high-angle</option>
+                        <option value="low-angle">low-angle</option>
+                        <option value="symmetry">symmetry</option>
+                        <option value="fish-eye">fish-eye</option>
+                        <option value="first-person">first-person</option>
                     </select>
                 </div>
             </div>
@@ -242,14 +336,31 @@
     form.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        // نمایش Toast
-        toast.classList.add("show");
+        console.log("Form is being submitted...");
 
-        // شبیه‌سازی درخواست API و تأخیر برای نمایش Toast
-        setTimeout(() => {
-            toast.classList.remove("show");
-            alert("تصویر با موفقیت تولید شد!");  // این پیام را می‌توانید با فرآیند واقعی جایگزین کنید
-        }, 3000);
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                toast.classList.remove("show");
+                if (data.images) {
+                    alert("تصویر با موفقیت تولید شد!");
+                } else {
+                    alert(data.error || "خطایی در تولید تصویر رخ داده است.");
+                }
+            })
+            .catch(error => {
+                toast.classList.remove("show");
+                alert("خطایی در ارسال درخواست رخ داد.");
+                console.error('Error:', error);
+            });
     });
 
     // فعال کردن دکمه ارسال فرم زمانی که همه فیلدها پر شده باشد
