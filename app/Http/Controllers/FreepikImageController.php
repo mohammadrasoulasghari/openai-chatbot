@@ -25,7 +25,7 @@ class FreepikImageController extends Controller
                     'Content-Type' => 'application/json',
                     'x-freepik-api-key' => $apiKey,
                     'Accept' => 'application/json',
-                    'Accept-Language' => 'fa-IR', // Set to Persian language
+                    'Accept-Language' => 'fa-IR',
                 ],
                 'json' => [
                     'prompt' => $request->input('prompt'),

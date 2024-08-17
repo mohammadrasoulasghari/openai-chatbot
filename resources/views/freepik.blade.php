@@ -89,17 +89,6 @@
             box-sizing: border-box;
         }
 
-        input[type="text"]::placeholder, input[type="number"]::placeholder, select {
-            font-family: 'Vazirmatn', sans-serif;
-        }
-
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            background-color: #50515E;
-            border-color: #0A84FF;
-            box-shadow: 0 0 8px rgba(10, 132, 255, 0.5);
-            outline: none;
-        }
-
         button {
             padding: 15px;
             border: 1px solid #0A84FF;
@@ -173,6 +162,60 @@
                 padding: 10px;
                 font-size: 14px;
             }
+        }
+
+        /* Styles for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #343541;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            border-radius: 12px;
+        }
+
+        .modal img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #aaa;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .download-btn {
+            margin-top: 20px;
+            background-color: #0A84FF;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -326,12 +369,25 @@
     </div>
 </main>
 
+<!-- Modal for displaying generated image -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <img id="generatedImage" src="" alt="Generated Image">
+        <a id="downloadLink" href="#" class="download-btn" download="generated_image.png">دانلود تصویر</a>
+    </div>
+</div>
+
 <div id="toast" class="toast">در حال تولید تصویر...</div>
 
 <script>
     const form = document.getElementById("image-form");
     const submitButton = document.getElementById("submit-button");
     const toast = document.getElementById("toast");
+    const modal = document.getElementById("myModal");
+    const closeModal = document.querySelector(".close");
+    const generatedImage = document.getElementById("generatedImage");
+    const downloadLink = document.getElementById("downloadLink");
 
     form.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -350,8 +406,13 @@
             .then(response => response.json())
             .then(data => {
                 toast.classList.remove("show");
-                if (data.images) {
-                    alert("تصویر با موفقیت تولید شد!");
+                if (data.images && data.images.length > 0) {
+                    const base64Image = `data:image/png;base64,${data.images[0].base64}`;
+                    generatedImage.src = base64Image;
+                    downloadLink.href = base64Image;
+
+                    // نمایش modal
+                    modal.style.display = "flex";
                 } else {
                     alert(data.error || "خطایی در تولید تصویر رخ داده است.");
                 }
@@ -362,6 +423,18 @@
                 console.error('Error:', error);
             });
     });
+
+    // بستن modal
+    closeModal.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // بستن modal با کلیک خارج از آن
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
 
     // فعال کردن دکمه ارسال فرم زمانی که همه فیلدها پر شده باشد
     form.querySelectorAll("input, select").forEach(input => {
