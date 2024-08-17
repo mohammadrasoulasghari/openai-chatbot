@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FreepikImageController;
 use App\Http\Controllers\SpeechToGenerateController;
 use App\Http\Controllers\SpeechToTextController;
 use Illuminate\Support\Facades\Route;
@@ -29,3 +30,5 @@ Route::get('/speech-to-text', function () {
 Route::get('/speech-to-generate', function () {
     return view('speech-to-generate');
 });
+Route::get('/freepik', [FreepikImageController::class, 'showForm'])->name('freepik.form');
+Route::post('/generate-image', [FreepikImageController::class, 'generateImage'])->name('generate.image');
