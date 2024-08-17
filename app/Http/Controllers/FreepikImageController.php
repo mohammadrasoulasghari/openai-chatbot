@@ -14,8 +14,6 @@ class FreepikImageController extends Controller
     }
     public function generateImage(Request $request)
     {
-        Log::info($request->input('style'));
-
         $client = new Client([
             'verify' => false,
         ]);
@@ -49,7 +47,6 @@ class FreepikImageController extends Controller
             ]);
 
             $data = json_decode($response->getBody(), true);
-//            Log::info($data);
             return response()->json(['images' => $data['data'], 'meta' => $data['meta']]);
 
         } catch (\Exception $e) {
