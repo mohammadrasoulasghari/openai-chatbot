@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Spatie\Activitylog\Contracts\Activity;
 
 class FreepikImageController extends Controller
 {
@@ -12,6 +13,7 @@ class FreepikImageController extends Controller
     {
         return view('freepik');
     }
+
     public function generateImage(Request $request)
     {
         $client = new Client([
@@ -23,39 +25,52 @@ class FreepikImageController extends Controller
             $translatedPrompt = $this->translateToEnglish($request->input('prompt'));
             $negativePrompt = $request->input('negative_prompt', '');
             $translatedNegativePrompt = $negativePrompt ? $this->translateToEnglish($negativePrompt) : '';
+            $request_data = [
+                'prompt' => $translatedPrompt,
+                'negative_prompt' => $translatedNegativePrompt,
+                'num_inference_steps' => $request->input('num_inference_steps', 8),
+                'guidance_scale' => $request->input('guidance_scale', 1),
+                'num_images' => $request->input('num_images', 1),
+                'seed' => $request->input('seed', 42),
+                'image' => [
+                    'size' => $request->input('image_size'),
+                ],
+                'styling' => [
+                    'style' => $request->input('style', ''),
+                    'color' => 'pastel',
+                    'lightning' => $request->input('lightning', ''),
+                    'framing' => $request->input('framing', ''),
+                ],
+            ];
             $response = $client->post('https://api.freepik.com/v1/ai/text-to-image', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'x-freepik-api-key' => $apiKey,
                     'Accept' => 'application/json',
                 ],
-                'json' => [
-                    'prompt' => $translatedPrompt,
-                    'negative_prompt' => $translatedNegativePrompt,
-                    'num_inference_steps' => $request->input('num_inference_steps', 8),
-                    'guidance_scale' => $request->input('guidance_scale', 1),
-                    'num_images' => $request->input('num_images', 1),
-                    'seed' => $request->input('seed', 42),
-                    'image' => [
-                        'size' => $request->input('image_size'),
-                    ],
-                    'styling' => [
-                        'style' => $request->input('style', ''),
-                        'color' => 'pastel',
-                        'lightning' => $request->input('lightning', ''),
-                        'framing' => $request->input('framing', ''),
-                    ],
-                ],
+                'json' => $request_data,
             ]);
 
             $data = json_decode($response->getBody(), true);
+            activity()
+                ->causedByAnonymous()
+                ->withProperties([
+                    'service' => 'Freepick',
+                    'request_data' => $request_data,
+                    'response_data' => $data,
+                ])
+                ->log('Request and Response for Freepik API');
             return response()->json(['images' => $data['data'], 'meta' => $data['meta']]);
 
         } catch (\Exception $e) {
-            Log::error('خطا در تولید تصویر از Freepik API:', [
-                'message' => $e->getMessage(),
-                'stack' => $e->getTraceAsString(),
-            ]);
+            activity()
+                ->causedByAnonymous()
+                ->withProperties([
+                    'service' => 'Freepick',
+                    'message' => $e->getMessage(),
+                    'response_data' => $e->getTraceAsString(),
+                ])
+                ->log('Request and Response for Freepik API');
             return response()->json(['error' => 'Failed to generate image.'], 500);
         }
     }
@@ -79,6 +94,15 @@ class FreepikImageController extends Controller
         ]);
 
         $data = json_decode($response->getBody(), true);
+        activity()
+            ->causedByAnonymous()
+            ->withProperties([
+                'service' => 'ChatGPT',
+                'request_data' => $text,
+                'response_data' => $data,
+            ])
+            ->log('Translation request sent to ChatGPT and response received');
+
         return trim($data['choices'][0]['message']['content']);
     }
 
