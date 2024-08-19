@@ -306,6 +306,11 @@
                 width: 70px; /* عرض مناسب برای لوگو */
                 height: auto; /* حفظ نسبت اصلی تصویر */
             }
+            .toast.error {
+                background-color: #ff4c4c; /* رنگ قرمز برای خطا */
+                color: white;
+            }
+
         </style>
 
     @endsection
@@ -348,13 +353,33 @@
             const generatedImage = document.getElementById("generatedImage");
             const downloadLink = document.getElementById("downloadLink");
             const loaderOverlay = document.getElementById("loader-overlay");
+            document.addEventListener("DOMContentLoaded", function() {
+                checkFormValidity(); // بررسی اولیه برای فعال کردن دکمه
 
+                form.querySelectorAll("input, select").forEach(input => {
+                    input.addEventListener("input", () => {
+                        checkFormValidity();
+                    });
+                });
+            });
             form.addEventListener("submit", (event) => {
                 event.preventDefault();
-
+                console.log('asd')
                 // پاک کردن تمامی اعلان‌ها و پیام‌های قبلی
                 toast.classList.remove("show");
                 modal.style.display = "none";
+
+                let errorMessage = '';
+
+                // بررسی خالی بودن فیلد prompt
+                if (!form.prompt.value.trim()) {
+                    errorMessage = 'متن توصیفی (prompt) باید پر شود.';
+                }
+
+                if (errorMessage) {
+                    showToast(errorMessage, 'error');
+                    return; // جلوگیری از ارسال فرم
+                }
 
                 // نمایش لودر
                 loaderOverlay.style.visibility = 'visible';
@@ -381,14 +406,14 @@
                             // نمایش modal
                             modal.style.display = "flex";
                         } else {
-                            alert(data.error || "خطایی در تولید تصویر رخ داده است.");
+                            showToast(data.error || "خطایی در تولید تصویر رخ داده است.", 'error');
                         }
                     })
                     .catch(error => {
                         // پنهان کردن لودر
                         loaderOverlay.style.visibility = 'hidden';
 
-                        alert("خطایی در ارسال درخواست رخ داد.");
+                        showToast("خطایی در ارسال درخواست رخ داد.", 'error');
                         console.error('Error:', error);
                     });
             });
@@ -418,7 +443,28 @@
                     submitButton.disabled = !allFilled;
                 });
             });
+            function showToast(message, type = '') {
+                toast.classList.remove('show', 'error');
+                if (type) {
+                    toast.classList.add(type);
+                }
+                toast.textContent = message;
+                toast.classList.add('show');
 
+                setTimeout(() => {
+                    toast.classList.remove('show', type);
+                }, 3000); // پیام پس از 3 ثانیه پنهان می‌شود
+            }
+
+            function checkFormValidity() {
+                let allFilled = true;
+                form.querySelectorAll("input[required]").forEach(requiredInput => {
+                    if (!requiredInput.value.trim()) {
+                        allFilled = false;
+                    }
+                });
+                submitButton.disabled = !allFilled;
+            }
         </script>
     @endsection
 </div>
