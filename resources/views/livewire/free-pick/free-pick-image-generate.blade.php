@@ -57,7 +57,19 @@
                 flex-wrap: wrap;
                 padding: 5px;
             }
-
+            textarea {
+                padding: 12px;
+                border: 1px solid #50515E;
+                border-radius: 8px;
+                background-color: #40414F;
+                color: white;
+                font-size: 14px;
+                font-family: 'Vazirmatn', sans-serif;
+                transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+                box-sizing: border-box;
+                min-height: 100px; /* حداقل ارتفاع برای textarea */
+                resize: vertical; /* اجازه‌ی تغییر اندازه عمودی */
+            }
             .form-group > div {
                 flex: 1;
                 min-width: calc(50% - 15px);

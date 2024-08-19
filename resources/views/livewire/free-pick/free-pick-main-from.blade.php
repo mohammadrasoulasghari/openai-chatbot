@@ -3,11 +3,11 @@
     <div class="form-group">
         <div>
             <label for="prompt">متن توصیفی:</label>
-            <input type="text" id="prompt" name="prompt" required placeholder="این بخش به زبان انگلیسی وارد شود">
+            <textarea id="prompt" name="prompt" required placeholder="این بخش به زبان انگلیسی وارد شود"></textarea>
         </div>
         <div>
             <label for="negative_prompt">عباراتی که نباید در تصویر باشد:</label>
-            <input type="text" id="negative_prompt" name="negative_prompt" placeholder="این بخش به زبان انگلیسی وارد شود">
+            <textarea id="negative_prompt" name="negative_prompt" placeholder="این بخش به زبان انگلیسی وارد شود"></textarea>
         </div>
     </div>
     <div class="form-group">
