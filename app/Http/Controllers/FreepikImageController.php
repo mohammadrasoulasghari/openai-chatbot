@@ -20,16 +20,18 @@ class FreepikImageController extends Controller
         $apiKey = env('FREEPIK_API_KEY');
 
         try {
+            $translatedPrompt = $this->translateToEnglish($request->input('prompt'));
+            $negativePrompt = $request->input('negative_prompt', '');
+            $translatedNegativePrompt = $negativePrompt ? $this->translateToEnglish($negativePrompt) : '';
             $response = $client->post('https://api.freepik.com/v1/ai/text-to-image', [
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'x-freepik-api-key' => $apiKey,
                     'Accept' => 'application/json',
-                    'Accept-Language' => 'fa-IR',
                 ],
                 'json' => [
-                    'prompt' => $request->input('prompt'),
-                    'negative_prompt' => $request->input('negative_prompt', ''),
+                    'prompt' => $translatedPrompt,
+                    'negative_prompt' => $translatedNegativePrompt,
                     'num_inference_steps' => $request->input('num_inference_steps', 8),
                     'guidance_scale' => $request->input('guidance_scale', 1),
                     'num_images' => $request->input('num_images', 1),
@@ -57,4 +59,27 @@ class FreepikImageController extends Controller
             return response()->json(['error' => 'Failed to generate image.'], 500);
         }
     }
+
+    private function translateToEnglish($text)
+    {
+        $client = new Client();
+        $response = $client->post('https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'gpt-4o',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'Please translate the following text to English:'],
+                    ['role' => 'user', 'content' => $text],
+                ],
+                'temperature' => 0,
+            ],
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        return trim($data['choices'][0]['message']['content']);
+    }
+
 }
