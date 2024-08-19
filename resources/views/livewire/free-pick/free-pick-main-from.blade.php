@@ -31,6 +31,11 @@
                 <option value="square">مربع</option>
                 <option value="portrait">پرتره</option>
                 <option value="landscape">لنداسکیپ</option>
+                <option value="social_post">پست اجتماعی</option>
+                <option value="social_story">استوری اجتماعی</option>
+                <option value="standard">استاندارد</option>
+                <option value="rectangular">مستطیل</option>
+                <option value="widescreen" selected>وایداسکرین</option>
             </select>
         </div>
     </div>

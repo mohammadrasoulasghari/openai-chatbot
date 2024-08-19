@@ -35,7 +35,7 @@ class FreepikImageController extends Controller
                     'num_images' => $request->input('num_images', 1),
                     'seed' => $request->input('seed', 42),
                     'image' => [
-                        'size' => $request->input('image_size', 'square'),
+                        'size' => $request->input('image_size'),
                     ],
                     'styling' => [
                         'style' => $request->input('style', ''),
