@@ -52,25 +52,10 @@ class FreepikImageController extends Controller
             ]);
 
             $data = json_decode($response->getBody(), true);
-            activity()
-                ->causedByAnonymous()
-                ->withProperties([
-                    'service' => 'Freepick',
-                    'request_data' => $request_data,
-                    'response_data' => $data,
-                ])
-                ->log('Request and Response for Freepik API');
             return response()->json(['images' => $data['data'], 'meta' => $data['meta']]);
 
         } catch (\Exception $e) {
-            activity()
-                ->causedByAnonymous()
-                ->withProperties([
-                    'service' => 'Freepick',
-                    'message' => $e->getMessage(),
-                    'response_data' => $e->getTraceAsString(),
-                ])
-                ->log('Request and Response for Freepik API');
+
             return response()->json(['error' => 'Failed to generate image.'], 500);
         }
     }
@@ -94,14 +79,6 @@ class FreepikImageController extends Controller
         ]);
 
         $data = json_decode($response->getBody(), true);
-        activity()
-            ->causedByAnonymous()
-            ->withProperties([
-                'service' => 'ChatGPT',
-                'request_data' => $text,
-                'response_data' => $data,
-            ])
-            ->log('Translation request sent to ChatGPT and response received');
 
         return trim($data['choices'][0]['message']['content']);
     }
