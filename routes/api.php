@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\SpeechToTextController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +17,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/get-response', [ChatController::class, 'getResponse']);
+Route::post('/audio-to-text', [SpeechToTextController::class, 'processRequest']);
