@@ -342,8 +342,8 @@
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <img id="generatedImage" src="" alt="Generated Image">
-                    <input type="text" id="editPrompt" placeholder="درخواست ویرایش تصویر را وارد کنید...">
-                    <button id="submitEditButton">ویرایش تصویر</button>
+{{--                    <input type="text" id="editPrompt" placeholder="درخواست ویرایش تصویر را وارد کنید...">--}}
+{{--                    <button id="submitEditButton">ویرایش تصویر</button>--}}
                     <a id="downloadLink" href="#" class="download-btn" download="generated_image.png">دانلود تصویر</a>
                 </div>
             </div>
@@ -520,7 +520,7 @@
                         formData.append('prompt', editPrompt);
                         formData.append('size', '1024x1024'); // سایز تصویر
 
-                        return fetch('YOUR_BACKEND_ENDPOINT_FOR_IMAGE_EDIT', {
+                        return fetch('edit-image', {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
