@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\SupportedServices;
 use App\Utilities\StreamUtility;
+use Illuminate\Support\Facades\Config;
 use OpenAI;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -32,17 +33,19 @@ class ChatService
         return StreamUtility::streamChatResponse($this->client, $question);
     }
 
-    private function getApiKey($service)
+    private function getApiKey(SupportedServices $service)
     {
-        return env(strtoupper($service->value) . '_API_KEY');
+        return match ($service) {
+            SupportedServices::OPENAI => Config::get('openai.api_key'),
+            SupportedServices::AVALAI => Config::get('avalai.api_key'),
+        };
     }
 
     private function getBaseUrl(SupportedServices $service): string
     {
-        $urls = [
-            SupportedServices::OPENAI->value => 'https://api.openai.com/v1',
-            SupportedServices::AVALAI->value => 'https://api.avalapis.ir/v1'
-        ];
-        return $urls[$service->value] ?? '';
+        return match ($service) {
+            SupportedServices::OPENAI => Config::get('openai.base_url'),
+            SupportedServices::AVALAI => Config::get('avalai.base_url'),
+        };
     }
 }

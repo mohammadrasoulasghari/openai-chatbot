@@ -37,6 +37,7 @@ class SpeechToTextController extends Controller
 
             return response()->json(['transcription' => $transcription], 200);
         } catch (\Exception $e) {
+            Log::error('Error: ' . $e);
             Log::error('Exception during audio transcription: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to process audio file.'], 500);
         } finally {
