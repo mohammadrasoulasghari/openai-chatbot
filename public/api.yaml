@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: "API هوش مصنوعی سون لرن"
+  version: 1.0.0
+  description: |
+    این API امکاناتی برای پردازش هوشمند صوت و متن ارائه می‌دهد.
+    از جمله قابلیت‌های این سرویس می‌توان به موارد زیر اشاره کرد:
+
+    - **تبدیل صوت به متن**: ارسال فایل صوتی و دریافت متن معادل
+    - **تبدیل متن به صوت**: ارسال متن و دریافت فایل صوتی
+    - **چت استریم**: ارائه پاسخ‌های بلادرنگ با استفاده از تکنولوژی‌های هوش مصنوعی
+
+    برای استفاده از این سرویس‌ها، لطفاً به هر یک از اندپوینت‌ها مراجعه کنید.
+  contact:
+    name: "پشتیبان سرویس"
+    email: mohammadrasoulasghari1@gmail.com
+    url: "https://mohammadrasoulasghari.ir/"
+
+servers:
+  - url: "https://7learnchatbot.mohammadrasoul.lol/api/"
+    description: "سرور پروداکشن (Production Server)"
+  - url: "http://localhost:{port}/api"
+    description: "سرور محلی (Local Server)"
+    variables:
+      port:
+        enum:
+          - "8000"
+          - "{port}"
+        default: "8000"
+
+paths:
+  /audio-to-text:
+    post:
+      tags:
+        - "پردازش گفتار"
+      summary: "تبدیل فایل صوتی به متن"
+      description: |
+        این اندپوینت به کاربران اجازه می‌دهد تا یک فایل صوتی را ارسال کنند و
+        متن تبدیل‌شده آن را به عنوان پاسخ دریافت نمایند. پردازش صوت از طریق
+        سرویس انتخابی صورت می‌گیرد.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: "فایل صوتی که باید به متن تبدیل شود"
+                service:
+                  type: string
+                  description: "سرویس مورد استفاده برای پردازش (مانند openai)"
+                  example: "openai"
+      responses:
+        200:
+          description: "متن تبدیل‌شده با موفقیت برگردانده شد"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transcription:
+                    type: string
+                    description: "متن تبدیل‌شده از فایل صوتی"
+        400:
+          description: "درخواست نامعتبر - فایل یا سرویس انتخابی ارائه نشده است."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+        500:
+          description: "خطای سرور - مشکلی در پردازش فایل صوتی رخ داده است."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailureResponse'
+
+components:
+  schemas:
+    FailureResponse:
+      type: object
+      properties:
+        status:
+          type: boolean
+          description: "نشان‌دهنده ناموفق بودن عملیات"
+        message:
+          type: string
+          description: "پیامی حاوی اطلاعات اضافی"
+        error_code:
+          type: string
+          description: "کد خطا که نمایانگر نوع خطا می‌باشد"
+        status_code:
+          type: integer
+          description: "کد وضعیت HTTP"

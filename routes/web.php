@@ -38,3 +38,6 @@ Route::get('/freepik', FreePickImageGenerate::class)->name('freepik.form');
 Route::post('/generate-image', [FreepikImageController::class, 'generateImage'])->name('generate.image');
 Route::get('/test', ChatBot::class);
 Route::post('/edit-image', [ImageEditController::class, 'edit']);
+Route::get('/swagger', function () {
+    return view('swagger');
+});
