@@ -338,7 +338,15 @@
         </div>
 
         <!-- Modal for displaying generated image -->
-         <livewire:free-pick.show-image-modal />
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <img id="generatedImage" src="" alt="Generated Image">
+                    <input type="text" id="editPrompt" placeholder="درخواست ویرایش تصویر را وارد کنید...">
+                    <button id="submitEditButton">ویرایش تصویر</button>
+                    <a id="downloadLink" href="#" class="download-btn" download="generated_image.png">دانلود تصویر</a>
+                </div>
+            </div>
 
         <div id="toast" class="toast">در حال تولید تصویر...</div>
     @endsection
@@ -465,6 +473,84 @@
                 });
                 submitButton.disabled = !allFilled;
             }
+            const submitEditButton = document.getElementById('submitEditButton');
+
+            submitEditButton.addEventListener('click', () => {
+                const editPrompt = document.getElementById('editPrompt').value;
+                const imageUrl = generatedImage.src; // آدرس تصویر فعلی
+
+                if (!editPrompt.trim()) {
+                    showToast('لطفاً توضیحات مربوط به ویرایش تصویر را وارد کنید.', 'error');
+                    return;
+                }
+
+                // نمایش لودر
+                loaderOverlay.style.visibility = 'visible';
+
+                // دریافت تصویر و تبدیل به blob
+                fetch(imageUrl)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                // ساخت یک تصویر جدید برای تبدیل به فرمت PNG
+                                const img = new Image();
+                                img.src = reader.result;
+                                img.onload = () => {
+                                    const canvas = document.createElement('canvas');
+                                    canvas.width = img.width;
+                                    canvas.height = img.height;
+                                    const ctx = canvas.getContext('2d');
+                                    ctx.drawImage(img, 0, 0);
+
+                                    // تبدیل تصویر به PNG
+                                    canvas.toBlob((blob) => {
+                                        resolve(blob);
+                                    }, 'image/png');
+                                };
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                    })
+                    .then(pngBlob => {
+                        const formData = new FormData();
+                        formData.append('image', pngBlob, 'image.png');
+                        formData.append('prompt', editPrompt);
+                        formData.append('size', '1024x1024'); // سایز تصویر
+
+                        return fetch('YOUR_BACKEND_ENDPOINT_FOR_IMAGE_EDIT', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            },
+                            body: formData
+                        });
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // پنهان کردن لودر
+                        loaderOverlay.style.visibility = 'hidden';
+
+                        if (data.images && data.images.length > 0) {
+                            const base64Image = `data:image/png;base64,${data.images[0].base64}`;
+                            generatedImage.src = base64Image;
+                            downloadLink.href = base64Image;
+                        } else {
+                            showToast(data.error || 'خطایی در ویرایش تصویر رخ داده است.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        // پنهان کردن لودر
+                        loaderOverlay.style.visibility = 'hidden';
+
+                        showToast('خطایی در ارسال درخواست رخ داد.', 'error');
+                        console.error('Error:', error);
+                    });
+            });
+
+
         </script>
     @endsection
 </div>

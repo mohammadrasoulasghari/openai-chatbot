@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FreepikImageController;
+use App\Http\Controllers\ImageEditController;
 use App\Http\Controllers\SpeechToGenerateController;
 use App\Http\Controllers\SpeechToTextController;
 use App\Livewire\ChatBot;
@@ -36,3 +37,4 @@ Route::get('/freepik', FreePickImageGenerate::class)->name('freepik.form');
 
 Route::post('/generate-image', [FreepikImageController::class, 'generateImage'])->name('generate.image');
 Route::get('/test', ChatBot::class);
+Route::post('/edit-image', [ImageEditController::class, 'edit']);
