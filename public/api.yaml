@@ -17,7 +17,7 @@ info:
     url: "https://mohammadrasoulasghari.ir/"
 
 servers:
-  - url: "https://7learnchatbot.mohammadrasoul.lol/api/"
+  - url: "http://78.47.252.13:8090/api/"
     description: "سرور پروداکشن (Production Server)"
   - url: "http://localhost:{port}/api"
     description: "سرور محلی (Local Server)"
